@@ -15,6 +15,7 @@ Asegúrate de clonar este repositorio a tu cuenta usando el botón **`Fork`**.
 Ya con el repositorio en tu cuenta lo siguiente que debes hacer copiar el `enlace de tu repositorio`, lo que se puede hacer directamente desdel navegador:
 
 ![repo](./images/repo.png)
+
 Posteriormente, lo uniremos con el siguiente enlace en nuestro navegador de preferencia:
 
 ```url

@@ -52,7 +52,7 @@ function pdaLibro(n_libro) {
 async function crearBiblioteca(n_biblioteca) {
   const [pda_biblioteca] = pdaBiblioteca(n_biblioteca); // Primero se obtiene la cuenta de la biblioteca
 
-  await pg.program.methods // mediante la libreria pg (solana playground) se acceden a los metodos del programa
+  const txHash = await pg.program.methods // mediante la libreria pg (solana playground) se acceden a los metodos del programa
     .crearBiblioteca(n_biblioteca) // crear biblioteca
     .accounts({
       // Se agregan las cuentas de las que depende (Contexto del struct NuevaBiblioteca)
@@ -60,6 +60,8 @@ async function crearBiblioteca(n_biblioteca) {
       biblioteca: pda_biblioteca,
     })
     .rpc();
+
+  console.log("txHash: ", txHash);
 }
 
 //////////////////// Agregar Libro ////////////////////
@@ -69,7 +71,7 @@ async function agregarLibro(n_libro, paginas) {
   const [pda_libro] = pdaLibro(n_libro); // se determina la cuenta del libro
   const [pda_biblioteca] = pdaBiblioteca(n_biblioteca); // se obtiene la cuenta de la biblioteca
 
-  await pg.program.methods
+  const txHash = await pg.program.methods
     .agregarLibro(n_libro, paginas) // agregar_libro
     .accounts({
       // cuentas del contexto
@@ -78,6 +80,8 @@ async function agregarLibro(n_libro, paginas) {
       biblioteca: pda_biblioteca,
     })
     .rpc();
+
+  console.log("txHash: ", txHash);
 }
 
 //////////////////// Alternar estado ////////////////////
@@ -87,7 +91,7 @@ async function cambiarEstado(n_libro) {
   const [pda_libro] = pdaLibro(n_libro); // se determina la cuenta del libro
   const [pda_biblioteca] = pdaBiblioteca(n_biblioteca); // se obtiene la cuenta de la biblioteca
 
-  await pg.program.methods
+  const txHash = await pg.program.methods
     .alternarEstado(n_libro) // alternar_estado
     .accounts({
       // cuentas del contexto
@@ -96,6 +100,8 @@ async function cambiarEstado(n_libro) {
       biblioteca: pda_biblioteca,
     })
     .rpc();
+
+  console.log("txHash: ", txHash);
 }
 
 //////////////////// Eliminar Libro ////////////////////
@@ -104,7 +110,7 @@ async function eliminarLibro(n_libro) {
   // Eliminar Libro
   const [pda_libro] = pdaLibro(n_libro); // se determina la cuenta del libro
   const [pda_biblioteca] = pdaBiblioteca(n_biblioteca); // se obtiene la cuenta de la biblioteca
-  await pg.program.methods
+  const txHash = await pg.program.methods
     .eliminarLibro(n_libro) // eliminar_libro
     .accounts({
       // cuentas del contexto
@@ -113,9 +119,24 @@ async function eliminarLibro(n_libro) {
       biblioteca: pda_biblioteca,
     })
     .rpc();
+
+  console.log("txHash: ", txHash);
 }
 
 //////////////////// Ver Libros ////////////////////
+/*
+ Anteriormente, en la version anterior de la biblioteca, esta instruccion se encotraba implementada dentro del Solana Program, pero... ¿porque ya no?
+ En la prinmera version de la biblioteca los libros eran structs contenidos en un vector dentro de la cuenta biblioteca. Al ser elementos de un vector 
+ su visualizacion era mas simple. En este caso, cada libro se encuentra definido por una cuenta, por lo que visualizar informacion de multiples cuentas 
+ desde el Solana Program es ineficiente a comparacion de hacerlo desde el frontend. 
+
+Para lograr hacerlo es necesario realizar los siguientes pasos:
+
+1. Determinar el PDA de la biblioteca 
+2. Obtener el vector de libros (direcciones)
+3. Por cada direccion, obtener la informacion del libro 
+4. Mostrarla con console.log
+*/
 async function verLibros(n_biblioteca) {
   // Ver Libros
   const [pda_biblioteca] = pdaBiblioteca(n_biblioteca); // se obtiene la cuenta de la biblioteca
@@ -148,6 +169,8 @@ async function verLibros(n_biblioteca) {
       console.log(
         `Libro #${i + 1}: \n * Nombre: ${libroAccount.nombre} \n * Páginas: ${
           libroAccount.paginas
+        } \n * Biblioteca: ${
+          libroAccount.biblioteca
         } \n * Disponible: ${
           libroAccount.disponible
         } \n * Dirección(PDA): ${libroKey.toBase58()}`
@@ -168,6 +191,8 @@ async function verLibros(n_biblioteca) {
 
 // crearBiblioteca(n_biblioteca);
 // agregarLibro("El alquimista", 255);
-// eliminarLibro("");
+// eliminarLibro("El alquimista");
 // cambiarEstado("El alquimista");
-verLibros(n_biblioteca);
+// verLibros(n_biblioteca);
+
+// solana confirm -v <txHash>
