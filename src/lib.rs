@@ -48,7 +48,7 @@ pub mod biblioteca {
             .libros
             .push(context.accounts.libro.key()); // Agrega el PDA del libro al vector de libros de biblioteca
 
-        msg!("Libro {}, creado exitosamente, la biblioteca {}!. Owner id: {}", nombre.clone(),  context.accounts.biblioteca.n_biblioteca, context.accounts.owner.key()); // Log de verificacion
+        msg!("Libro {}, creado exitosamente, en la biblioteca {}!. Owner id: {}", nombre.clone(),  context.accounts.biblioteca.n_biblioteca, context.accounts.owner.key()); // Log de verificacion
     
         Ok(())
     }
